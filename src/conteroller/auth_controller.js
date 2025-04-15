@@ -1,9 +1,9 @@
-import User from "../models/auth.js"; // Ensure correct import
+import User from "../models/auth.js";
 import jwt from "jsonwebtoken";
-import { generateOTP } from "../utils/otp.js"; // Ensure correct import
+import { generateOTP } from "../utils/otp.js";
 
 
-// 📌 Register User & Send OTP
+// Register User & Send OTP
 export const signup= async (req, res) => {
     const { phone } = req.body;
 
@@ -21,12 +21,12 @@ export const signup= async (req, res) => {
         const result = await user.save();
         res.json({ message: "OTP sent successfully" });
     } catch (err) {
-        console.error("Error during signup:", err); // Log the error for debugging
+        console.error("Error during signup:", err); 
         res.status(500).json({ error: "Server Error" });
     }
 }
 
-// 📌 Verify OTP & Create  exportAccount
+//  Verify OTP & Create  exportAccount
 export const verifyOTP= async (req, res) => {
     const { phone, otp } = req.body;
     try {
@@ -47,7 +47,7 @@ export const verifyOTP= async (req, res) => {
     }
 }
 
-// 📌 Login User
+//  Login User
 export const login= async (req, res) => {
     const { phone } = req.body;
 
@@ -55,39 +55,32 @@ export const login= async (req, res) => {
 
     try {
         const user = await User.findOne({ phone });
-
-        if (!user) return res.status(400).json({ error: "User not found" });
-
+        if (!user) return res.status(400).json({ error: "User not found" })
         if (!user.isVerified) return res.status(400).json({ error: "User not verified" });
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-
+        const token = jwt.sign({ user_details: user._id }, process.env.JWT_SECRET, { expiresIn: "1d" });
         res.json({ message: "Login successful", token });
     } catch (err) {
         res.status(500).json({ error: "Server Error" });
     }
 }
 
-// 📌 Logout User
+//  Logout User
 export const logout= async (req, res) => {
     const { token } = req.body;
 
     if (!token) return res.status(400).json({ error: "Token is required" });
 
     try {
-        // Invalidate the token (this is a mock, in real-world you would store invalidated tokens)
         res.json({ message: "Logout successful" });
     } catch (err) {
         res.status(500).json({ error: "Server Error" });
     }
 }
 
-// 📌 Refresh Token
+//  Refresh Token
 export const refreshToken= async (req, res) => {
     const { token } = req.body;
-
     if (!token) return res.status(400).json({ error: "Token is required" });
-
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const newToken = jwt.sign({ id: decoded.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -98,7 +91,7 @@ export const refreshToken= async (req, res) => {
     }
 }
 
-// 📌 Forgot Password
+//  Forgot Password
 export const forgotPassword= async (req, res) => {
     const { phone } = req.body;
 
@@ -113,7 +106,7 @@ export const forgotPassword= async (req, res) => {
         user.otp = otp;
         await user.save();
 
-        console.log(`OTP for password reset: ${otp}`); // Simulating OTP sending
+        console.log(`OTP for password reset: ${otp}`);
 
         res.json({ message: "OTP sent for password reset" });
     } catch (err) {
@@ -121,7 +114,7 @@ export const forgotPassword= async (req, res) => {
     }
 }
 
-// 📌 Reset Password
+//  Reset Password
 export const resetPassword= async (req, res) => {
     const { phone, otp, newPassword } = req.body;
 

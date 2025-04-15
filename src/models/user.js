@@ -37,7 +37,6 @@ const UserSchema = new mongoose.Schema({
     familyIncome: { type: String },
 
     //social details
-
     maritalStatus: { type: String, enum: ["Single", "Married", "Divorced"], required: true },
     hometown: { type: String, required: true },
     montherTongue: { type: String },
@@ -55,9 +54,22 @@ const UserSchema = new mongoose.Schema({
     designation: { type: String, required: true },
     companyName: { type: String, required: true },
     annualIncome: { type: String, required: true },
-    verifyProfile: { type: String, enum: ["Pan", "Aadhar", "Passport", "Driving License"], required: true },
-    documentNo: { type: String, required: true },
-    verificationStatus: {type: Boolean }
+    documentDetails: [
+        {
+            document: {
+                type: String,
+                enum: ["Pan", "Aadhar", "Passport", "Driving License"],
+                required: true
+            },
+            documentNo: { type: String, required: true },
+            verified: { type: Boolean, default: false }
+        }
+    ],
+    userStatus: { 
+        type: String, 
+        enum: ["newProfile", "allMatch", "allShortlist", "allConnectRequst", "allDiscover", "selectedDiscover"], 
+        required: true 
+    },
 });
 
 export default mongoose.model("User", UserSchema);
